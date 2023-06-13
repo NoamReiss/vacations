@@ -1,0 +1,26 @@
+.Icons>* {
+    cursor: pointer;
+}
+
+.Icons>.adminIcons {
+    display: flex;
+    flex-direction: row;
+    gap: 5px;
+    color: #FFC857;
+}
+
+.heartIcon {
+    transition: color 0.3s ease;
+}
+
+.heartIcon:hover {
+    scale: 1.1;
+}
+
+.filled {
+    color: red;
+}
+
+.outlined {
+    color: #FFC857;
+}

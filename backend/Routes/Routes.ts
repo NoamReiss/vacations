@@ -48,13 +48,13 @@ router.get(
 ///////users////////////
 
 // get all the users
-router.get(
-  "/userList",
-  async (request: Request, response: Response, next: NextFunction) => {
-    const result = await Logic.getAllUsers();
-    response.status(200).json(result);
-  }
-);
+// router.get(
+//   "/userList",
+//   async (request: Request, response: Response, next: NextFunction) => {
+//     const result = await Logic.getAllUsers();
+//     response.status(200).json(result);
+//   }
+// );
 
 //adding a new user
 router.post(
@@ -63,6 +63,15 @@ router.post(
     const newUser = request.body;
     const result = await Logic.addUser(newUser);
     response.status(201).json(result);
+  }
+);
+
+router.post(
+  "/getUser",
+  async (request: Request, response: Response, next: NextFunction) => {
+    const newUser = request.body;
+    const result = await Logic.getUser(newUser);
+    response.status(200).json(result);
   }
 );
 
@@ -79,27 +88,37 @@ router.get(
 router.post(
   "/addFollower",
   async (request: Request, response: Response, next: NextFunction) => {
-    const newFollower = request.body;
-    const result = await Logic.addFollower(newFollower);
+    const userId = +request.body.user_code;
+    const vacationId = +request.body.vacation_code;
+    const result = await Logic.toggleLike(userId, vacationId);
     response.status(201).json(result);
   }
 );
 
-router.delete(
-  "/deleteFollower/:user_code",
+// router.delete(
+//   "/deleteFollower/:user_code",
+//   async (request: Request, response: Response, next: NextFunction) => {
+//     const userCode = +request.params.user_code;
+//     Logic.deleteVacation(userCode);
+//     response.status(204).json();
+//   }
+// );
+
+router.post(
+  "/getLikesByUser",
   async (request: Request, response: Response, next: NextFunction) => {
-    const userCode = +request.params.user_code;
-    Logic.deleteVacation(userCode);
-    response.status(204).json();
+    const userId = +request.body.user_code;
+
+    const likes = await Logic.getLikesByUser(userId);
+    response.status(200).json(likes);
   }
 );
 
 router.get(
-  "/vacationFollowers/:vacation_code",
+  "/vacationFollowers",
   async (request: Request, response: Response, next: NextFunction) => {
-    const vacationCode = +request.params.vacation_code;
-    const result = await Logic.getFollowersByVacationCode(vacationCode);
-    response.status(204).json(result);
+    const result = await Logic.getLikesPerVacation();
+    response.status(200).json(result);
   }
 );
 

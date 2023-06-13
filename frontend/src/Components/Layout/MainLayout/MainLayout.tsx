@@ -1,7 +1,7 @@
 import MainRoutes from "../../Routes/MainRoutes/MainRoutes";
 import Footer from "../Footer/Footer";
 import Header from "../Header/Header";
-import Main from "../Main/Main";
+
 import "./MainLayout.css";
 
 function MainLayout(): JSX.Element {

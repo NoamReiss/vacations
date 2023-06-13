@@ -1,0 +1,18 @@
+.SingleVacation {
+    margin: 20px 20px;
+}
+
+#inside-image {
+    position: relative;
+}
+
+#favorite {
+    z-index: 20;
+    position: absolute;
+    left: 0px;
+    top: 0px;
+}
+
+.liked {
+    color: red;
+}
