@@ -1,5 +1,6 @@
 import express, { NextFunction, Request, Response } from "express";
 import Logic from "../Logic/Logic";
+import upload from "../Logic/FileUpload";
 
 //creating the router
 const router = express.Router();
@@ -12,7 +13,20 @@ router.post(
   async (request: Request, response: Response, next: NextFunction) => {
     const newVacation = request.body;
     const result = await Logic.addVacation(newVacation);
-    response.status(201).json(result);
+    response.status(201).json({
+      newVacation: result,
+      vacationId: result.vacation_code,
+      message: "Vacation added successfully",
+    });
+  }
+);
+
+//for upload an image
+router.put(
+  "/upload/:id",
+  upload.single("image"),
+  (request: Request, response: Response) => {
+    response.send("image uploaded successfully");
   }
 );
 
@@ -45,16 +59,25 @@ router.get(
   }
 );
 
-///////users////////////
+router.get(
+  "/likesPerVacation",
+  async (request: Request, response: Response, next: NextFunction) => {
+    const vacations = await Logic.getLikesPerVacation();
+    response.status(200).json(vacations);
+  }
+);
 
-// get all the users
-// router.get(
-//   "/userList",
-//   async (request: Request, response: Response, next: NextFunction) => {
-//     const result = await Logic.getAllUsers();
-//     response.status(200).json(result);
-//   }
-// );
+//get vacation by id
+router.get(
+  "/list/:id",
+  async (request: Request, response: Response, next: NextFunction) => {
+    const vacationId = +request.params.id;
+    const vacation = await Logic.getVacationByCode(vacationId);
+    response.status(200).json(vacation);
+  }
+);
+
+///////users////////////
 
 //adding a new user
 router.post(
@@ -71,6 +94,14 @@ router.post(
   async (request: Request, response: Response, next: NextFunction) => {
     const newUser = request.body;
     const result = await Logic.getUser(newUser);
+    response.status(200).json(result);
+  }
+);
+router.post(
+  "/getUserByEmail/:email",
+  async (request: Request, response: Response, next: NextFunction) => {
+    const email = request.params.email;
+    const result = await Logic.getUserByEmail(email);
     response.status(200).json(result);
   }
 );
@@ -94,15 +125,6 @@ router.post(
     response.status(201).json(result);
   }
 );
-
-// router.delete(
-//   "/deleteFollower/:user_code",
-//   async (request: Request, response: Response, next: NextFunction) => {
-//     const userCode = +request.params.user_code;
-//     Logic.deleteVacation(userCode);
-//     response.status(204).json();
-//   }
-// );
 
 router.post(
   "/getLikesByUser",

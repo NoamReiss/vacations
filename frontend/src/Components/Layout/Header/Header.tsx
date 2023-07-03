@@ -1,17 +1,9 @@
-import React, { useEffect, useState } from "react";
-import {
-  AppBar,
-  Button,
-  ThemeProvider,
-  Toolbar,
-  Typography,
-} from "@mui/material";
+import { useEffect, useState } from "react";
+import { AppBar, Button, Toolbar, Typography } from "@mui/material";
 
 import "./Header.css";
 import { Stack } from "@mui/system";
 import { useNavigate } from "react-router-dom";
-// import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-// import { faPlaneDeparture } from "@fortawesome/free-solid-svg-icons";
 
 import { travel } from "../../../Redux/TravelStore";
 import AdminNav from "../../NavBars/AdminNav/AdminNav";
@@ -20,18 +12,15 @@ import { isLoggedInAction } from "../../../Redux/usersReducer";
 import { userIsAdmin, userLoggedIn } from "../../Utils/AuthUtils";
 
 function Header(): JSX.Element {
-  const [initials, setInitials] = useState<string>("");
   const navigate = useNavigate();
   const loggedIn = userLoggedIn();
   const isAdmin = userIsAdmin();
-
+  const [name, setName] = useState<string>("");
   useEffect(() => {
     if (loggedIn) {
       const user = travel.getState().users.users[0];
-      const firstInitial = user.private_name.charAt(0);
-      const lastInitial = user.last_name.charAt(0);
-      const initials = firstInitial + lastInitial;
-      setInitials(initials);
+
+      setName(user.private_name + " " + user.last_name);
     }
   }, [loggedIn]);
 
@@ -42,7 +31,7 @@ function Header(): JSX.Element {
 
   return (
     <div className="Header">
-      <AppBar color="primary" style={{ position: "static" }}>
+      <AppBar color="transparent" style={{ position: "static" }}>
         <Toolbar>
           {!loggedIn ? (
             <>
@@ -52,13 +41,8 @@ function Header(): JSX.Element {
                   navigate("/");
                 }}
                 style={{ cursor: "pointer" }}>
-                {/* <FontAwesomeIcon
-                  icon={faPlaneDeparture}
-                  size="xl"
-                  style={{ color: "#ffffff", marginRight: "5px" }}
-                /> */}
-                <Typography variant="h4" component="div">
-                  Travel
+                <Typography variant="h3" component="div">
+                  Travel and Fun
                 </Typography>
               </div>
               <Stack direction="row" spacing={2} sx={{ marginLeft: "auto" }}>
@@ -79,9 +63,9 @@ function Header(): JSX.Element {
               </Stack>
             </>
           ) : isAdmin ? (
-            <AdminNav onLogout={handleLogout} initials={initials} />
+            <AdminNav onLogout={handleLogout} name={name} />
           ) : (
-            <UserNav onLogout={handleLogout} initials={initials} />
+            <UserNav onLogout={handleLogout} name={name} />
           )}
         </Toolbar>
       </AppBar>

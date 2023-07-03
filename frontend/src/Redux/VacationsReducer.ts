@@ -12,6 +12,8 @@ export enum VacationActionType {
   updatedVacation = "updatedVacation",
   getVacation = "getVacation",
   allVacations = "allVacations",
+  vacationLikes = "VacationLikes",
+  vacationUnlike = "VacationUnlike",
 }
 
 //action data structure
@@ -42,6 +44,14 @@ export const getVacationAction = (vacation_code: number): VacationAction => {
   return { type: VacationActionType.getVacation, payload: vacation_code };
 };
 
+export const vacationLikesAction = (vacationId: number): VacationAction => {
+  return { type: VacationActionType.vacationLikes, payload: vacationId };
+};
+
+export const vacationUnlikeAction = (vacationId: number): VacationAction => {
+  return { type: VacationActionType.vacationUnlike, payload: vacationId };
+};
+
 //this is the reducer function, but since it's manged only by redux, we built the function above
 export function VacationReducer(
   currentState: VacationState = new VacationState(),
@@ -59,7 +69,15 @@ export function VacationReducer(
       );
       break;
     case VacationActionType.updatedVacation:
-      newState.allVacations = [...newState.allVacations, action.payload];
+      const updatedIndex = newState.allVacations.findIndex(
+        (v) => v.vacation_code === action.payload.vacation_code
+      );
+
+      if (updatedIndex !== -1) {
+        const updatedVacations = [...newState.allVacations];
+        updatedVacations[updatedIndex] = action.payload;
+        newState.allVacations = updatedVacations;
+      }
       break;
     case VacationActionType.getVacation:
       newState.allVacations = newState.allVacations.filter(
@@ -69,6 +87,41 @@ export function VacationReducer(
     case VacationActionType.allVacations:
       newState.allVacations = action.payload;
       break;
+    case VacationActionType.vacationLikes:
+      const vacationId = action.payload;
+      const updatedVacations = currentState.allVacations.map((vacation) => {
+        if (vacation.vacation_code === vacationId) {
+          const updatedLikes = (vacation.likes || 0) + 1;
+          return {
+            ...vacation,
+            likes: updatedLikes,
+          };
+        }
+        return vacation;
+      });
+
+      return {
+        ...currentState,
+        allVacations: updatedVacations,
+      };
+
+    case VacationActionType.vacationUnlike:
+      const unlikeVacationId = action.payload;
+
+      const unlikeVacations = currentState.allVacations.map((vacation) => {
+        if (vacation.vacation_code === unlikeVacationId) {
+          const updatedLikes = (vacation.likes || 0) - 1;
+          return {
+            ...vacation,
+            likes: updatedLikes,
+          };
+        }
+        return vacation;
+      });
+      return {
+        ...currentState,
+        allVacations: unlikeVacations,
+      };
   }
 
   return newState;

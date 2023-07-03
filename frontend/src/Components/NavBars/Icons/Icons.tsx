@@ -15,9 +15,13 @@ import {
   Tooltip,
 } from "@mui/material";
 import axios from "axios";
-import { updateLikes } from "../../Redux/UserReducer";
-import { vacationLikes, vacationUnlike } from "../../Redux/VacationReducer";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
+import { updateLikesAction } from "../../../Redux/usersReducer";
+import {
+  vacationLikesAction,
+  vacationUnlikeAction,
+} from "../../../Redux/VacationsReducer";
+import { travel } from "../../../Redux/TravelStore";
 
 interface IconProps {
   vacationId?: number;
@@ -33,12 +37,15 @@ function Icons({
   initialLikes,
 }: IconProps): JSX.Element {
   const navigate = useNavigate();
-  const dispatch = useDispatch();
-  const likeUrl = "http://localhost:4000/api/v1/likes";
-  const user = useSelector((state: any) => state.users.user[0]);
-  // const [liked, setLiked] = useState<boolean>(false);
+
+  const user = useSelector((state: any) => state.users.users[0]);
+  const likesVac = useSelector(
+    (state: any) => state.users.users[0].likedVacations
+  );
+
   const [likes, setLikes] = useState<number>(initialLikes);
   const [showDeleteModal, setShowDeleteModal] = useState<boolean>(false);
+  const [updatedLikedVacations, setUpdatedLikedVacations] = useState(likesVac);
 
   const handleEdit = () => {
     navigate(`/editVacation/${vacationId}`);
@@ -52,36 +59,36 @@ function Icons({
   };
 
   const handleLike = () => {
-    console.log("like icon is clicked...");
-    const userId = user.id;
+    const userId = user.user_code;
     const requestData = {
-      userId: userId,
-      vacationId: vacationId,
+      user_code: userId,
+      vacation_code: vacationId,
     };
 
     try {
-      console.log("typeof vacationId: ", typeof vacationId);
-      console.log("is array an array?: ", Array.isArray(user.likedVacations));
       const isLiked = user.likedVacations.includes(vacationId);
-      let updatedLikedVacations = [...user.likedVacations];
+
       if (isLiked) {
-        // Unlike the vacation
-        dispatch(vacationUnlike(vacationId!));
+        travel.dispatch(vacationUnlikeAction(vacationId!));
+
         setLikes((prevLikes) => prevLikes - 1);
 
         // Update the liked vacations array
-        updatedLikedVacations = updatedLikedVacations.filter(
-          (id: number) => id !== vacationId
-        );
+
+        setUpdatedLikedVacations(updatedLikedVacations);
+        // updatedLikedVacations.filter((id: number) => id !== vacationId)
       } else {
         // Like the vacation
-        dispatch(vacationLikes(vacationId!));
+        travel.dispatch(vacationLikesAction(vacationId!));
         setLikes((prevLikes) => prevLikes + 1);
-        updatedLikedVacations.push(vacationId!);
+        // updatedLikedVacations.push(vacationId!);
       }
-      dispatch(updateLikes([vacationId!]));
+      travel.dispatch(updateLikesAction([vacationId!]));
 
-      axios.post(`${likeUrl}/addLike`, requestData);
+      axios.post(
+        `http://localhost:4000/api/v1/vacations/addFollower`,
+        requestData
+      );
     } catch (error) {
       console.log(error);
     }

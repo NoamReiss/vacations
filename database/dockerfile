@@ -1,0 +1,6 @@
+#Inherit current image from mysql image
+FROM mysql:8.0
+
+#copy northwind SQL to start up file to inject SQL commands
+COPY ./travel.sql /docker-entrypoint-initdb.d
+

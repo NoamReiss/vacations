@@ -8,9 +8,9 @@ export function userIsAdmin(): boolean {
   const loggedIn = userLoggedIn();
 
   if (loggedIn) {
-    const user = travel.getState().users.users[0];
+    const isAdmin = travel.getState().users.isAdmin;
 
-    return user.isAdmin;
+    return isAdmin;
   } else {
     return false;
   }

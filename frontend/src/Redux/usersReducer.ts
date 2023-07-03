@@ -4,6 +4,7 @@ import User from "../Components/Models/User";
 export class usersState {
   public users: User[] = [];
   public isLoggedIn: boolean = false;
+  public isAdmin: boolean = false;
 }
 
 //what action i will use...
@@ -11,7 +12,6 @@ export enum UserActionType {
   addUser = "addUser",
   getUser = "getUser",
   isLoggedIn = "isLoggedIn",
-
   updateLikes = "updateLikes",
 }
 
@@ -33,12 +33,11 @@ export const addUserAction = (newUser: User): UserAction => {
 export const getUserAction = (newUser: User): UserAction => {
   return { type: UserActionType.getUser, payload: newUser };
 };
-export const isAdminAction = (newUser: User): UserAction => {
-  return { type: UserActionType.getUser, payload: newUser };
-};
+
 export const updateLikesAction = (likes: number[]): UserAction => {
   return { type: UserActionType.updateLikes, payload: likes };
 };
+
 //this is the reducer function, but since it's manged only by redux, we built the function above
 export function UsersReducer(
   currentState: usersState = new usersState(),
@@ -53,10 +52,13 @@ export function UsersReducer(
 
     case UserActionType.getUser:
       const user = action.payload;
-      const likedVacationsString = user.likedVacations || "[]";
-      const likedVacations = JSON.parse(likedVacationsString) as number[];
-      const userWithLikedVacations = { ...user, likedVacations };
-      newState.users = [userWithLikedVacations];
+      if (user) {
+        const likedVacationsString = user.likedVacations || "[]";
+        const likedVacations = JSON.parse(likedVacationsString) as number[];
+        const userWithLikedVacations = { ...user, likedVacations };
+        newState.isAdmin = action.payload.isAdmin;
+        newState.users = [userWithLikedVacations];
+      }
       break;
     case UserActionType.isLoggedIn:
       newState.isLoggedIn = action.payload;
@@ -64,6 +66,7 @@ export function UsersReducer(
         newState.users = [];
       }
       break;
+
     case UserActionType.updateLikes:
       const updatedUser = { ...newState.users[0] };
       const likedVacationId = action.payload[0] || 0;

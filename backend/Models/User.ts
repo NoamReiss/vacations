@@ -5,7 +5,8 @@ class User {
   public last_name: string;
   public email: string;
   public password: string;
-  public isAdmin: boolean; //?
+  public isAdmin: boolean;
+  public likedVacations: number[];
 
   constructor(
     user_code: number,
@@ -13,7 +14,8 @@ class User {
     last_name: string,
     email: string,
     password: string,
-    isAdmin: boolean
+    isAdmin: boolean,
+    likedVacations: number[]
   ) {
     this.user_code = user_code;
     this.private_name = private_name;
@@ -21,6 +23,7 @@ class User {
     this.email = email;
     this.password = password;
     this.isAdmin = isAdmin;
+    this.likedVacations = likedVacations;
   }
 }
 

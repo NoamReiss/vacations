@@ -19,9 +19,3 @@ export class VacationNotFoundError extends ClientError {
     super(404, `vacation_code:${vacation_code} was not found`);
   }
 }
-
-// export class UserNotLoggedError extends ClientError {
-//   public constructor() {
-//     super(401, "User not authrized, please login...");
-//   }
-// }

@@ -5,17 +5,20 @@ import reportWebVitals from "./reportWebVitals";
 import MainLayout from "./Components/Layout/MainLayout/MainLayout";
 import { BrowserRouter } from "react-router-dom";
 import { Provider } from "react-redux";
-import { travel } from "./Redux/TravelStore";
+import { persister, travel } from "./Redux/TravelStore";
+import { PersistGate } from "redux-persist/integration/react";
 
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
 );
 root.render(
-  <Provider store={travel}>
-    <BrowserRouter>
-      <MainLayout />
-    </BrowserRouter>
-  </Provider>
+  <BrowserRouter>
+    <Provider store={travel}>
+      <PersistGate loading={null} persistor={persister}>
+        <MainLayout />
+      </PersistGate>
+    </Provider>
+  </BrowserRouter>
 );
 
 // If you want to start measuring performance in your app, pass a function

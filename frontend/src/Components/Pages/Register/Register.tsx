@@ -14,21 +14,41 @@ import {
   Typography,
 } from "@mui/material";
 import axios from "axios";
-import { useState } from "react";
+
 import { addUserAction } from "../../../Redux/usersReducer";
 import { travel } from "../../../Redux/TravelStore";
+import { useState } from "react";
 
 function Register(): JSX.Element {
   const navigate = useNavigate();
-  const [refresh, setRefresh] = useState(false);
+  const [isPass, setIsPass] = useState(false);
+
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm<User>();
 
-  const send = (userData: User) => {
-    axios
+  const validateEmail = async (email: string) => {
+    let vEmail;
+    await axios
+      .post(`http://localhost:4000/api/v1/vacations/getUserByEmail/${email}`)
+      .then((response) => {
+        vEmail = response.data;
+      });
+    if (vEmail) {
+      return true;
+    } else {
+      return false;
+    }
+  };
+
+  const send = async (userData: User) => {
+    if (await validateEmail(userData.email)) {
+      setIsPass(true);
+      return;
+    }
+    await axios
       .post("http://localhost:4000/api/v1/vacations/addUser", userData)
       .then((response) => {
         travel.dispatch(addUserAction(response.data));
@@ -96,6 +116,7 @@ function Register(): JSX.Element {
                   <TextField
                     fullWidth
                     id="email"
+                    onKeyUp={() => setIsPass(false)}
                     type="email"
                     label="Email Address"
                     autoComplete="email"
@@ -111,6 +132,11 @@ function Register(): JSX.Element {
                     })}
                   />
                   <span className="ErrMsg">{errors.email?.message}</span>
+                  {isPass && (
+                    <span className="ErrMsg">
+                      this email Already have an account
+                    </span>
+                  )}
                 </Grid>
                 <Grid item xs={12}>
                   <TextField
@@ -147,9 +173,6 @@ function Register(): JSX.Element {
             </Grid>
           </Box>
         </Box>
-        {/* <Copyright sx={{ mt: 5 }} /> */}
-
-        {/* </ThemeProvider> */}
       </Container>
     </div>
   );

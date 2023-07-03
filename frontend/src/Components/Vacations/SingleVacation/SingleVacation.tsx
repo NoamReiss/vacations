@@ -4,37 +4,56 @@ import {
   Card,
   CardActions,
   CardContent,
+  CardHeader,
   CardMedia,
-  IconButton,
   Typography,
 } from "@mui/material";
-import FavoriteIcon from "@mui/icons-material/Favorite";
+
 import "./SingleVacation.css";
 import moment from "moment";
 
+import Icons from "../../NavBars/Icons/Icons";
+
 interface vacationProps {
+  vacation_code: number;
   destination: string;
   description: string;
   start_date: Date;
   end_date: Date;
   price: number;
   file_img_name: string;
+  likes: number;
+  isAdmin: boolean;
+  onDelete: () => void;
 }
 function SingleVacation(props: vacationProps): JSX.Element {
+  const imageUrl = `http://localhost:4000/${props.vacation_code}_${props.file_img_name}`;
+
   return (
     <div className="SingleVacation">
       <Box width="300px">
         <Card variant="outlined">
-          <div id="inside-image">
-            <IconButton id="favorite" aria-label="add to favorites">
-              <FavoriteIcon />
-            </IconButton>
-            <CardMedia
-              component="img"
-              height="200px"
-              src={props.file_img_name}
+          <div className="cardHeader">
+            <CardHeader
+              title={
+                <div className="headerTitle">
+                  <Icons
+                    vacationId={props.vacation_code}
+                    onDelete={props.onDelete}
+                    isAdmin={props.isAdmin}
+                    initialLikes={props.likes}
+                  />
+                </div>
+              }
             />
           </div>
+
+          <CardMedia
+            sx={{ height: 270, objectFit: "cover" }}
+            component="img"
+            src={imageUrl}
+            alt={`${props.destination}`}
+          />
           <CardContent
             sx={{
               display: "flex",

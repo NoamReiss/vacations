@@ -1,0 +1,106 @@
+#MYSQL Container + REST API Container + React Container + volume (internal docker hdd)
+#NOTE: for hot-reloading React, use => "start": "WATCHPACK_POLLING=true react-scripts start" in package.json
+
+services:
+  # travel database (mysql service):
+  travel-database-service:
+    #Image name to create from DockerFile
+    image: reissnoam/travel-database-service-image:1.0
+
+    # Build the image (if not exists) from specified Dockerfile location:
+    build: ./database
+
+    # Container name:
+    container_name: travel-database-container
+
+    #port binding [host:container]
+    ports:
+      - 3307:3306
+
+    #Environment variables needed by MySql:
+    environment:
+      MYSQL_HOST: localhost #internally for the container
+      MYSQL_DATABASE: travel
+      MYSQL_USER: root
+      MYSQL_PASSWORD: 12345678
+      MYSQL_ROOT_PASSWORD: 12345678 #needed by mysql image
+
+    #On crash - restart container, unless manually stopped:
+    restart: unless-stopped
+
+    #Database volumes:
+    volumes:
+      - travel:/var/lib/mysql
+      - /app/node_modules
+
+  #---------------------------------------------------------------
+
+  # travel backend service
+  travel-backend-service:
+    #Image name to create from Dockerfile:
+    image: reissnoam/travel-backend-service-image:1.0
+
+    #Build the image (if not exists) from a specifiec dockerfile location:
+    build: ./backend
+
+    #container name
+    container_name: travel-backend-container
+
+    #Port binding (host:container):
+    ports:
+      - 5000:4000
+
+    #Environment variables needed by this service:
+    environment:
+      PORT: 4000
+      MYSQL_HOST: travel-database-service #Above database service name is the host name
+      MYSQL_DATABASE: travel
+      MYSQL_USER: root
+      MYSQL_PASSWORD: 12345678
+
+    #On crash - restart container, unless manually stopped:
+    restart: unless-stopped
+
+    #Host bolume for mounting backend development files to backend container
+    volumes:
+      - ./backend:/app
+
+    # On which service we are depending on (starting/stopping order):
+    depends_on:
+      - travel-database-service
+  #---------------------------------------------------------------
+
+  # travel frontend service
+  travel-frontend-service:
+    #Image name to create  from dockerfile:
+    image: reissnoam/travel-frontend-service-image:1.0
+
+    #Build the image (if not exists) from specified Dockerfile location:
+    build: ./Frontend
+
+    #Container name:
+    container_name: travel-frontend-container
+
+    #Port binding (host:container):
+    ports:
+      - 3000:3000
+
+    #On crash - restart container, unless manually stopped:
+    restart: unless-stopped
+
+    #Host volume for mounting Frontend development files to Frontend container
+    volumes:
+      - ./Frontend:/app
+
+    #On which service we are depending on (start/stopping order):
+    depends_on:
+      - travel-backend-service
+
+#---------------------------------------------------------------
+
+# volumes
+volumes:
+  travel:
+
+  #for running docker-compse , run the command inside the docker-compose.yml file
+  #docker-compose up -d
